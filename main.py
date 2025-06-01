@@ -1,8 +1,12 @@
 from functions import *
 from whois import whois
+import argparse
 
 
-website_link =  "https://python.org" # input("Enter website link: ")
+parser = argparse.ArgumentParser(description="ReconPie - Website Reconnaissance Tool")
+parser.add_argument("website_link", type=str, help="Website link to scan (e.g. https://python.org)")
+args = parser.parse_args()
+website_link = args.website_link
 
 
 print("Site map crawling...\n")
@@ -26,6 +30,9 @@ for subdomain in subdomains:
     info = get_information(f"https://{subdomain}")
     emails.extend(info["emails"])
     phones.extend(info["phones"])
+print("information collected.")
 
 whois_info = whois(website_link)
-print(whois_info)
+print("whois completed.")
+
+generate_html_report(website_link, site_map, subdomains, open_ports, emails, phones, whois_info)
