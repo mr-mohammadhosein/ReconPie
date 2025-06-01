@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import dns.resolver
 import socket
+import re
 
 def get_links(url):
     try:
@@ -93,7 +94,21 @@ def get_ports(ip_address):
         result = sock.connect_ex((ip_address, port))
         if result == 0:
             open_ports.append(port)
+            print(f"Port {port} is open")
         sock.close()
     return open_ports
 
+# get email and phone numbers in site using regex
+def get_information(domain):
+    try:
+        response = requests.get(domain)
+        soup = BeautifulSoup(response.content, "html.parser")
+        text = soup.get_text()
+
+        emails = re.findall(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", text)
+        phones = re.findall(r"(?:\+?\d{1,3}[- ]?)?(?:0?\d{2,4}[- ]?)?\d{3}[- ]?\d{4}", text)
+        print(f"{emails} ,, {phones}")
+        return {"emails": emails, "phones": phones}
+    except Exception as e:
+        return {"emails": [], "phones": []}
 
